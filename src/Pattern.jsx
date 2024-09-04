@@ -55,41 +55,6 @@ function getChartData(pattern) {
   };
 }
 
-const initialChartOptions = {
-  plugins: {
-    zoom: {
-      pan: {
-        enabled: true,
-        mode: "x",
-      },
-      zoom: {
-        wheel: {
-          enabled: true,
-        },
-        mode: "x",
-      },
-    },
-    legend: {
-      display: false,
-    },
-  },
-  scales: {
-    x: {
-      type: "linear",
-      min: 0,
-      max: 2,
-    },
-    y: {
-      min: 0,
-      max: 100,
-    },
-  },
-  maintainAspectRatio: true,
-  animation: {
-    duration: 0,
-  },
-};
-
 function isValidPattern(pattern) {
   if (!pattern) {
     return true;
@@ -98,92 +63,198 @@ function isValidPattern(pattern) {
 }
 const Pattern = ({ patterns, setPatterns, patternKey, setPatternKey }) => {
   const [apiKey, setApiKey] = useState("API Key");
-  const [chartOptions, setChartOptions] = useState(initialChartOptions);
+
   const [inProgress, setInProgress] = useState(false);
 
   const chartRef = React.useRef();
 
-  function getChartOptions(newXmin, newXmax) {
-    const { current: chart } = chartRef;
-    let chartXmin = 0;
-    let chartXmax = 2;
-
-    if (chart) {
-      chartXmin = chart.scales.x.min;
-      chartXmax = chart.scales.x.max;
-    }
-
-    if (newXmin !== undefined) {
-      chartXmin = newXmin;
-    }
-    if (newXmax !== undefined) {
-      chartXmax = newXmax;
-    }
-
-    const chartOptions = structuredClone(initialChartOptions);
-
-    chartOptions.onClick = function (event, elementsAtEvent) {
-      console.log(event);
-
-      const { current: chart } = chartRef;
-      if (!chart) return;
-
-      let x = chart.scales.x.getValueForPixel(event.x);
-      x = Math.round(x * 1000) / 1000;
-      const y = parseInt(chart.scales.y.getValueForPixel(event.y));
-
-      if (x < 0 || y < 0 || y > 100) return;
-
-      if (elementsAtEvent.length) {
-        setPatterns((prevPatterns) => {
-          const newPatterns = structuredClone(prevPatterns);
-          for (const element of elementsAtEvent) {
-            if (newPatterns[patternKey]) {
-              newPatterns[patternKey].splice(element.index, 1);
-              if (newPatterns[patternKey].length === 0) {
-                delete newPatterns[patternKey];
-              }
-            }
-          }
-          return newPatterns;
-        });
-      } else {
-        setPatterns((prevPatterns) => {
-          const newPatterns = structuredClone(prevPatterns);
-          if (!newPatterns[patternKey]) {
-            newPatterns[patternKey] = [];
-          }
-          newPatterns[patternKey].push([x, y]);
-          newPatterns[patternKey].sort(([a], [b]) => a - b);
-          return newPatterns;
-        });
-      }
-    };
-    chartOptions.scales = {
+  const initialChartOptions = {
+    plugins: {
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+          },
+          mode: "x",
+        },
+      },
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
       x: {
         type: "linear",
+        min: 0,
+        max: 2,
       },
       y: {
         min: 0,
         max: 100,
       },
-    };
+    },
+    maintainAspectRatio: true,
+    animation: {
+      duration: 0,
+    },
+  };
 
-    return chartOptions;
-  }
+  const chartOnClick = function (event, elementsAtEvent) {
+    console.log(event);
+
+    const { current: chart } = chartRef;
+    if (!chart) return;
+
+    let x = chart.scales.x.getValueForPixel(event.x);
+    x = Math.round(x * 1000) / 1000;
+    const y = parseInt(chart.scales.y.getValueForPixel(event.y));
+
+    if (x < 0 || y < 0 || y > 100) return;
+
+    if (elementsAtEvent.length) {
+      setPatterns((prevPatterns) => {
+        const newPatterns = structuredClone(prevPatterns);
+        for (const element of elementsAtEvent) {
+          if (newPatterns[patternKey]) {
+            newPatterns[patternKey].splice(element.index, 1);
+            if (newPatterns[patternKey].length === 0) {
+              delete newPatterns[patternKey];
+            }
+          }
+        }
+        return newPatterns;
+      });
+    } else {
+      setPatterns((prevPatterns) => {
+        const newPatterns = structuredClone(prevPatterns);
+        console.log("add point to", newPatterns[patternKey]);
+        if (!newPatterns[patternKey]) {
+          console.log("old pattern is null");
+          newPatterns[patternKey] = [];
+        }
+        newPatterns[patternKey].push([x, y]);
+        newPatterns[patternKey].sort(([a], [b]) => a - b);
+        console.log("new pattern", newPatterns[patternKey]);
+        return newPatterns;
+      });
+    }
+  };
+
+  const [chartOptions, setChartOptions] = useState(initialChartOptions);
+
+  // function getChartOptions(newXmin, newXmax) {
+  //   const { current: chart } = chartRef;
+  //   let chartXmin = 0;
+  //   let chartXmax = 2;
+
+  //   if (chart) {
+  //     chartXmin = chart.scales.x.min;
+  //     chartXmax = chart.scales.x.max;
+  //   }
+
+  //   if (newXmin !== undefined) {
+  //     chartXmin = newXmin;
+  //   }
+  //   if (newXmax !== undefined) {
+  //     chartXmax = newXmax;
+  //   }
+
+  //   const chartOptions = structuredClone(initialChartOptions);
+
+  //   chartOptions.onClick = function (event, elementsAtEvent) {
+  //     console.log(event);
+
+  //     const { current: chart } = chartRef;
+  //     if (!chart) return;
+
+  //     let x = chart.scales.x.getValueForPixel(event.x);
+  //     x = Math.round(x * 1000) / 1000;
+  //     const y = parseInt(chart.scales.y.getValueForPixel(event.y));
+
+  //     if (x < 0 || y < 0 || y > 100) return;
+
+  //     if (elementsAtEvent.length) {
+  //       setPatterns((prevPatterns) => {
+  //         const newPatterns = structuredClone(prevPatterns);
+  //         for (const element of elementsAtEvent) {
+  //           if (newPatterns[patternKey]) {
+  //             newPatterns[patternKey].splice(element.index, 1);
+  //             if (newPatterns[patternKey].length === 0) {
+  //               delete newPatterns[patternKey];
+  //             }
+  //           }
+  //         }
+  //         return newPatterns;
+  //       });
+  //     } else {
+  //       setPatterns((prevPatterns) => {
+  //         const newPatterns = structuredClone(prevPatterns);
+  //         console.log("add point to", newPatterns[patternKey]);
+  //         if (!newPatterns[patternKey]) {
+  //           console.log("old pattern is null");
+  //           newPatterns[patternKey] = [];
+  //         }
+  //         newPatterns[patternKey].push([x, y]);
+  //         newPatterns[patternKey].sort(([a], [b]) => a - b);
+  //         console.log("new pattern", newPatterns[patternKey]);
+  //         return newPatterns;
+  //       });
+  //     }
+  //   };
+  //   chartOptions.scales = {
+  //     x: {
+  //       type: "linear",
+  //     },
+  //     y: {
+  //       min: 0,
+  //       max: 100,
+  //     },
+  //   };
+
+  //   return chartOptions;
+  // }
 
   React.useEffect(() => {
     console.log("use effect pattern key", patternKey);
-    const pattern = patterns[patternKey];
-    let xmin = 0;
-    let xmax = 2;
-    if (pattern) {
+    let pattern = patterns[patternKey];
+
+    if (!pattern) {
+      setPatterns((patterns) => {
+        patterns = structuredClone(patterns);
+        patterns[patternKey] = [];
+        return patterns;
+      });
+      pattern = [];
+    }
+
+    let xmin;
+    let xmax;
+    if (pattern.length === 0) {
+      xmin = 0;
+      xmax = 1;
+    }
+    if (pattern.length >= 2) {
       xmin = Math.min(...pattern.map((i) => i[0]));
       xmax = Math.max(...pattern.map((i) => i[0]));
+    } else if (pattern.length === 1) {
+      xmin = pattern[0][0] - 0.5;
+      xmax = pattern[0][0] + 0.5;
     }
 
     console.log("changed patternkey", patternKey, xmin, xmax);
-    setChartOptions(getChartOptions(xmin, xmax));
+
+    const newchartOptions = structuredClone(initialChartOptions);
+    newchartOptions.scales.x.min = xmin;
+    newchartOptions.scales.x.max = xmax;
+    newchartOptions.onClick = chartOnClick;
+
+    setChartOptions(newchartOptions);
+
+    // setChartOptions(getChartOptions(xmin, xmax));
   }, [patternKey]);
 
   function uploadScript(pattern, apiKey) {
@@ -308,7 +379,13 @@ const Pattern = ({ patterns, setPatterns, patternKey, setPatternKey }) => {
         if (pattern) {
           let xmin = Math.min(...pattern.map((i) => i[0]));
           let xmax = Math.max(...pattern.map((i) => i[0]));
-          setChartOptions(getChartOptions(xmin, xmax));
+
+          const newchartOptions = structuredClone(chartOptions);
+          newchartOptions.scales.x.min = xmin;
+          newchartOptions.scales.x.max = xmax;
+          setChartOptions(newchartOptions);
+
+          // setChartOptions(getChartOptions(xmin, xmax));
         }
       };
       reader.readAsText(file);
