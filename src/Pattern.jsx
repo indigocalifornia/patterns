@@ -213,7 +213,13 @@ const Pattern = ({ patterns, setPatterns, patternKey, setPatternKey }) => {
       method: "POST",
       body: formData,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error();
+        }
+      })
       .then((data) => {
         console.log("upload success");
         const url = convertToDownloadUrl(data.data.url);
@@ -228,7 +234,13 @@ const Pattern = ({ patterns, setPatterns, patternKey, setPatternKey }) => {
             url: url,
           }),
         })
-          .then((response) => response.json())
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error();
+            }
+          })
           .then((data) => {
             console.log("upload success");
             const estimatedServerTime = new Date().getTime();
@@ -243,7 +255,13 @@ const Pattern = ({ patterns, setPatterns, patternKey, setPatternKey }) => {
                 startTime: 0,
               }),
             })
-              .then((response) => response.json())
+              .then((response) => {
+                if (response.ok) {
+                  return response.json();
+                } else {
+                  throw new Error();
+                }
+              })
               .then((data) => {
                 console.log("start success");
                 setInProgress(false);
@@ -267,7 +285,13 @@ const Pattern = ({ patterns, setPatterns, patternKey, setPatternKey }) => {
       method: "PUT",
       headers: headers,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error();
+        }
+      })
       .then((data) => setInProgress(false))
       .catch((error) => setInProgress("Error talking to Handy"));
   }

@@ -6,8 +6,6 @@ import Timeline from "./Timeline";
 
 import { downloadJson } from "./utils";
 
-// const Timeline = loadable(() => import("./Timeline"));
-
 if (process.env.NODE_ENV === "production") {
   console.log = function () {};
 }
@@ -173,6 +171,25 @@ const IndexPage = () => {
       setVideoSrc(videoUrl);
     } else {
       alert("Please select a valid video file.");
+    }
+  };
+
+  const handleUploadFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const funscript = JSON.parse(e.target.result);
+        const track = funscript.actions.map((i) => [i.at / 1000, i.pos]);
+        setTrack(track);
+
+        const xmax = Math.max(...track.map((i) => i[0]));
+        const newchartOptions = structuredClone(chartOptions);
+        newchartOptions.scales.x.max = 0;
+        newchartOptions.scales.x.max = xmax;
+        setChartOptions(newchartOptions);
+      };
+      reader.readAsText(file);
     }
   };
 
@@ -442,6 +459,20 @@ const IndexPage = () => {
             value={bpm}
             onChange={(e) => setBpm(parseInt(e.target.value))}
           />
+
+          <label
+            htmlFor="upload-script"
+            className="btn btn-secondary h-full join-item"
+          >
+            <input
+              id="upload-script"
+              type="file"
+              accept=".funscript"
+              className="hidden"
+              onChange={handleUploadFileChange}
+            />
+            Open script
+          </label>
 
           <button
             className="btn btn-warning join-item"
