@@ -158,7 +158,7 @@ const IndexPage = () => {
   const [totalTime, setTotalTime] = React.useState(0);
   const [videoSrc, setVideoSrc] = React.useState("");
   const [patterns, setPatterns] = React.useState({});
-  const [bpm, setBpm] = React.useState(0);
+  const [bpm, setBpm] = React.useState(128);
   const [patternKey, setPatternKey] = React.useState();
   const [chartOptions, setChartOptions] = React.useState(initialChartOptions);
 
