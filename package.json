@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@piwikpro/react-piwik-pro": "^2.1.1",
     "chart.js": "^4.4.4",
     "chartjs-plugin-zoom": "^2.0.1",
     "daisyui": "^4.12.10",
